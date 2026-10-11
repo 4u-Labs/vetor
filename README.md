@@ -2,8 +2,7 @@
 
 Transforme imagens raster em vetores perfeitos (SVG, EPS, PDF, DXF) com isolamento inteligente de fundo e super-resolução.
 
-🔗 **Acesse online via GitHub Pages:** [https://4u-labs.github.io/vetor/](https://4u-labs.github.io/vetor/)  
-🌐 **Portal Oficial 4U:** [https://4u.ia.br/app/vetor/](https://4u.ia.br/app/vetor/)
+🌐 **Acesse a Aplicação Oficial:** [https://4u.ia.br/app/vetor/](https://4u.ia.br/app/vetor/)
 
 ---
 
