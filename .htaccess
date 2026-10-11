@@ -1,0 +1,9 @@
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+  Header set Cache-Control "no-cache, must-revalidate"
+</IfModule>
+<IfModule mod_mime.c>
+  AddType image/svg+xml .svg
+  AddType application/manifest+json .json
+  AddType application/wasm .wasm
+</IfModule>

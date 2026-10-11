@@ -1,0 +1,8 @@
+# Models larger than 100MB (GitHub file size limit)
+models/u2net.onnx
+
+# Local IDE / Agents cache
+.agents
+.aws
+.codex
+*.ses

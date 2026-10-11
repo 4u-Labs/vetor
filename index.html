@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VectorAI - Vetorizador Profissional com IA</title>
+  <link rel="icon" type="image/png" href="./favicon.png?v=3.0.0">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=3.0.0">
+  <link rel="manifest" href="./manifest.json?v=3.0.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #0d0f17;
+      --bg-panel: #161925;
+      --bg-card: #1f2333;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-gold: #f59e0b;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-color: #2b3147;
+      --border-focus: #60a5fa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      height: 52px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand span.badge {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-header:hover {
+      background: #282e42;
+      border-color: var(--border-focus);
+    }
+
+    .btn-header.btn-donate {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      border: none;
+      color: #000;
+      font-weight: 600;
+    }
+
+    .btn-header.btn-donate:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Main Workspace */
+    .workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left / Center: Viewer */
+    .viewer-area {
+      flex: 1;
+      background: #090b10;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Toolbar */
+    .viewer-toolbar {
+      height: 40px;
+      background: rgba(22, 25, 37, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 20;
+    }
+
+    .view-modes {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-dark);
+      padding: 3px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .view-mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .view-mode-btn.active {
+      background: var(--bg-card);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .zoom-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Canvas Viewport */
+    .canvas-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .canvas-viewport.grabbing {
+      cursor: grabbing;
+    }
+
+    .stage {
+      position: absolute;
+      transform-origin: center center;
+      transition: transform 0.05s ease-out;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .stage-container {
+      position: relative;
+      overflow: hidden;
+      background: repeating-conic-gradient(#e5e7eb 0% 25%, #ffffff 0% 50%) 50% / 16px 16px;
+      border-radius: 4px;
+    }
+
+    .stage-original, .stage-vector {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-conic-gradient(#e5e7eb 0% 25%, #ffffff 0% 50%) 50% / 16px 16px;
+    }
+
+    .stage-original img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .stage-vector #svg-container,
+    .stage-vector svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Split curtain slider */
+    .split-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #3b82f6;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+      z-index: 10;
+      cursor: ew-resize;
+    }
+
+    .split-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #3b82f6;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.7rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Empty Upload State */
+    .upload-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 30;
+      background: #090b10;
+    }
+
+    .dropzone {
+      width: 540px;
+      max-width: 90%;
+      border: 2px dashed #374151;
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      background: rgba(22, 25, 37, 0.5);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.08);
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+    }
+
+    .dropzone-icon {
+      font-size: 3.5rem;
+      color: var(--accent-blue);
+      margin-bottom: 16px;
+    }
+
+    .dropzone h2 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .dropzone p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    .sample-bar {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-sample {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-sample:hover {
+      background: #2b3248;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+
+    /* Right Sidebar - Controls */
+    .sidebar {
+      width: 330px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 40;
+    }
+
+    .sidebar-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Presets Buttons */
+    .preset-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 8px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .preset-btn.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--accent-blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .preset-btn i {
+      font-size: 1.1rem;
+      color: var(--accent-cyan);
+    }
+
+    /* AI Super-Resolution Switch */
+    .ai-upscale-container {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(59, 130, 246, 0.08));
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 10px 12px;
+      transition: all 0.2s;
+    }
+
+    .ai-upscale-container:hover {
+      border-color: rgba(168, 85, 247, 0.6);
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.2);
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 20px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--border-color);
+      transition: .25s;
+      border-radius: 20px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .25s;
+      border-radius: 50%;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Control Sliders */
+    .control-item {
+      margin-bottom: 14px;
+    }
+
+    .control-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+
+    .control-label span.val {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-card);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      border: 2px solid #fff;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Colors and background */
+    .color-pills {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .color-pill {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 5px 0;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .color-pill:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #fff;
+    }
+
+    .color-pill.active {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-cyan);
+    }
+
+    .palette-swatches-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+      max-height: 110px;
+      overflow-y: auto;
+      padding: 3px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      min-height: 38px;
+      align-items: center;
+    }
+
+    .palette-swatch-item {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .palette-swatch-item:hover {
+      transform: scale(1.2);
+      border-color: #fff;
+      z-index: 2;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Action Export Buttons */
+    .export-section {
+      padding: 16px;
+      margin-top: auto;
+      background: var(--bg-dark);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-download-svg {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-download-svg:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-download-png {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-download-png:hover {
+      background: #2b3248;
+    }
+
+    .btn-open-illus {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .btn-open-illus:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    /* Industrial Export Section (Passo 5) */
+    .industrial-export-divider {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .industrial-export-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-pro {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-industrial-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .btn-ind {
+      padding: 8px 4px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .btn-ind i {
+      font-size: 1.1rem;
+    }
+
+    .btn-ind .btn-ind-fmt {
+      font-weight: 700;
+      font-size: 0.76rem;
+      line-height: 1.1;
+    }
+
+    .btn-ind .btn-ind-sub {
+      font-size: 0.6rem;
+      opacity: 0.8;
+      line-height: 1;
+    }
+
+    .btn-download-pdf {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+    .btn-download-pdf:hover {
+      background: rgba(239, 68, 68, 0.24);
+      border-color: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-download-eps {
+      background: rgba(139, 92, 246, 0.12);
+      border-color: rgba(139, 92, 246, 0.35);
+      color: #c084fc;
+    }
+    .btn-download-eps:hover {
+      background: rgba(139, 92, 246, 0.24);
+      border-color: #a855f7;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-download-dxf {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .btn-download-dxf:hover {
+      background: rgba(16, 185, 129, 0.24);
+      border-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* Spinner */
+    .processing-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 15, 23, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .processing-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid rgba(59, 130, 246, 0.2);
+      border-top-color: var(--accent-cyan);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Help Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 600px;
+      max-width: 92%;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .export-settings {padding:14px;border:1px solid var(--border-color);border-radius:12px;background:var(--bg-secondary, #171b29);margin-bottom:12px;}
+    .export-settings h3 {font-size:.8rem;margin:0 0 14px;color:var(--text-primary, #fff);line-height:1.5;}
+    .export-fields {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;}
+    .export-field {display:flex;flex-direction:column;gap:7px;min-width:0;font-size:.75rem;color:var(--text-secondary);}
+    .export-field-wide {grid-column:1 / -1;}
+    .form-control {box-sizing:border-box;width:100%;min-width:0;height:40px;padding:8px 10px;border:1px solid #3a4258;border-radius:8px;background:#10141f;color:#eef2ff;font:inherit;color-scheme:dark;}
+    .form-control:focus-visible {outline:2px solid #60a5fa;outline-offset:2px;}
+    .form-control:disabled {opacity:.5;}
+    .field-help {font-size:.73rem;line-height:1.5;color:var(--text-muted);margin:10px 0 0;}
+    .gradient-control {margin:14px 0;}
+    .viewer-toolbar {height:auto;min-height:40px;flex-wrap:wrap;gap:8px;padding-top:6px;padding-bottom:6px;}
+    .view-modes {flex-wrap:wrap;}
+    .view-mode-btn {white-space:nowrap;}
+    .stage-container.side-by-side {background:transparent;}
+    #compare-labels:not([hidden]) {position:absolute;top:12px;left:0;right:0;display:grid;grid-template-columns:1fr 1fr;text-align:center;z-index:15;pointer-events:none;color:#e5e7eb;font-size:.8rem;}
+    #compare-labels span {justify-self:center;background:#171b29e8;border:1px solid #3a4258;border-radius:6px;padding:5px 12px;}
+    .split-handle {width:38px;height:38px;font-size:1rem;transform:translate(-50%,-50%) scale(var(--inverse-zoom,1));touch-action:none;}
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOP HEADER ================= -->
+  <header>
+    <a href="#" class="brand">
+      <img src="./favicon.png?v=3.0.0" alt="VectorAI Logo" style="width: 32px; height: 32px; border-radius: 8px;">
+      <h1>VectorAI</h1>
+    </a>
+
+    <div class="header-actions">
+      <a href="https://www.paypal.com/ncp/payment/L7YRCS984T33N" target="_blank" rel="noopener" class="btn-header btn-donate" id="txt-donate">
+        <i class="fab fa-paypal"></i> Apoiar
+      </a>
+      <button class="btn-header" id="btn-pwa" style="display:none;">
+        <i class="fas fa-download"></i> <span id="txt-install">Instalar App</span>
+      </button>
+      <button class="btn-header" id="btn-help">
+        <i class="fas fa-question-circle"></i> <span id="txt-help">Ajuda</span>
+      </button>
+      <button class="btn-header" id="btn-lang">
+        <i class="fas fa-globe"></i> <span>PT | EN</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= WORKSPACE ================= -->
+  <div class="workspace">
+    
+    <!-- LEFT: VIEWER -->
+    <div class="viewer-area">
+      
+      <!-- Toolbar -->
+      <div class="viewer-toolbar" id="viewer-toolbar" style="display: none;">
+        <div class="view-modes">
+          <button class="view-mode-btn active" data-mode="split" id="vm-split">
+            <i class="fas fa-columns"></i> Divisor
+          </button>
+          <button class="view-mode-btn" data-mode="vector" id="vm-vector">
+            <i class="fas fa-bezier-curve"></i> Vetor Puro
+          </button>
+          <button class="view-mode-btn" data-mode="original" id="vm-orig">
+            <i class="fas fa-image"></i> Original
+          </button>
+          <button class="view-mode-btn" data-mode="compare" id="vm-compare" aria-pressed="false"><span aria-hidden="true">◫</span> <span id="txt-compare">Lado a lado</span></button>
+        </div>
+
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="btn-zoom-out"><i class="fas fa-minus"></i></button>
+          <span id="txt-zoom">100%</span>
+          <button class="zoom-btn" id="btn-zoom-in"><i class="fas fa-plus"></i></button>
+          <button class="btn-header" id="btn-zoom-reset" style="padding: 3px 8px; font-size: 0.75rem;">Reset</button>
+        </div>
+      </div>
+
+      <!-- Canvas Viewport -->
+      <div class="canvas-viewport" id="viewport">
+        <div id="compare-labels" hidden><span>Original</span><span id="txt-current">Versão atual</span></div>
+        
+        <!-- Empty Upload State -->
+        <div class="upload-state" id="upload-state">
+          <div class="dropzone" id="dropzone">
+            <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+            <h2 id="txt-drop-title">Arraste uma imagem aqui</h2>
+            <p id="txt-drop-sub">ou clique para selecionar (JPG, PNG, WEBP)</p>
+            <input type="file" id="file-input" accept="image/*" style="display:none;">
+            <button class="btn-action btn-download-svg" style="width: auto; margin: 0 auto; padding: 10px 24px;" id="btn-browse">
+              <i class="fas fa-folder-open"></i> <span id="txt-browse">Escolher Imagem</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Render Stage -->
+        <div class="stage" id="stage" style="display: none;">
+          <div class="stage-container" id="stage-container">
+            <div class="stage-original" id="stage-original">
+              <img id="img-original" src="" alt="Original">
+            </div>
+            <div class="stage-vector" id="stage-vector">
+              <div id="svg-container"></div>
+            </div>
+            <div class="split-divider" id="split-divider">
+              <div class="split-handle"><i class="fas fa-arrows-alt-h"></i></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Processing Spinner -->
+      <div class="processing-overlay" id="spinner">
+        <div class="spinner"></div>
+        <button type="button" id="btn-cancel" class="btn-header">Cancelar</button>
+        <p id="txt-processing" style="font-weight: 500;">Calculando curvas de Bézier e retas sub-pixel...</p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: CONTROLS & EXPORT -->
+    <div class="sidebar" id="sidebar" style="display: none;">
+      
+      <div class="sidebar-section">
+        <p id="processing-status" role="status" aria-live="polite" style="font-size:.85rem;line-height:1.5">Pronto.</p>
+        <button id="btn-retry" class="btn-header">Tentar novamente</button>
+      </div>
+      <!-- Presets -->
+      <div class="sidebar-section">
+        <div class="sidebar-title" id="txt-title-presets">Modo de Vetorização</div>
+        <div class="preset-group">
+          <button class="preset-btn" data-preset="logo" id="preset-logo">
+            <i class="fas fa-shapes"></i>
+            <span id="txt-preset-logo">Logotipo (2 Cores)</span>
+          </button>
+          <button class="preset-btn active" data-preset="art" id="preset-art">
+            <i class="fas fa-paint-brush"></i>
+            <span id="txt-preset-art">Ilustração (Multi-Cores)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Super Resolution Toggle -->
+      <div class="sidebar-section">
+        <div class="ai-upscale-container">
+          <div class="control-label" style="align-items: center; margin-bottom: 5px;">
+            <span style="display: flex; align-items: center; gap: 7px; font-weight: 600; color: #fff;">
+              <i class="fas fa-magic" style="color: #c084fc;"></i> <span id="txt-ai-upscale-title">Super-Resolução IA 4x</span>
+            </span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="chk-ai-upscale">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.35; margin: 0;" id="txt-ai-upscale-desc">
+            Restaura arestas e remove ruído via Real-ESRGAN antes de vetorizar.
+          </p>
+        </div>
+
+        <!-- Recorte Inteligente de Fundo com IA (AI Background Isolation) -->
+        <div class="ai-upscale-container" style="margin-top: 10px; border-color: rgba(236, 72, 153, 0.35); background: linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(219, 39, 119, 0.04) 100%);">
+          <div class="control-label" style="align-items: center; margin-bottom: 5px;">
+            <span style="display: flex; align-items: center; gap: 7px; font-weight: 600; color: #fff;">
+              <i class="fas fa-cut" style="color: #ec4899;"></i> <span id="txt-ai-bg-title">Recorte de Fundo IA</span>
+            </span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="chk-ai-bg">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.35; margin: 0;" id="txt-ai-bg-desc">
+            Isola o objeto principal e elimina fundos falsos (xadrez fake, brancos e sombras).
+          </p>
+          <div id="ai-bg-options" style="display: none; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(236, 72, 153, 0.2);">
+            <div style="margin-bottom: 8px;">
+              <label style="display: block; font-size: 0.72rem; color: #f472b6; font-weight: 600; margin-bottom: 4px;" id="lbl-ai-bg-mode">Modo de Recorte</label>
+              <select id="sel-ai-bg-mode" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 6px; padding: 5px 8px; font-size: 0.75rem; cursor: pointer; outline: none;">
+                <option value="auto" id="opt-ai-bg-auto">⚡ Auto Inteligente (Recomendado)</option>
+                <option value="corners" id="opt-ai-bg-corners">🏷️ Quinas & Bordas (Ícones, Logos & Cards)</option>
+                <option value="neural" id="opt-ai-bg-neural">🧠 IA Profunda (Fotos & Pessoas)</option>
+              </select>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 3px;">
+                <span id="lbl-ai-bg-tol">Tolerância do Fundo</span>
+                <span id="val-ai-bg-tol" style="color: #f472b6; font-weight: 600;">35</span>
+              </div>
+              <input type="range" id="slider-ai-bg-tol" min="10" max="75" step="1" value="35" style="width: 100%; accent-color: #ec4899; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mathematical Geometrization & Snapping (Passo 2) -->
+      <div class="sidebar-section">
+        <div class="ai-upscale-container" style="border-color: rgba(59, 130, 246, 0.35); background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);">
+          <div class="control-label" style="align-items: center; margin-bottom: 5px;">
+            <span style="display: flex; align-items: center; gap: 7px; font-weight: 600; color: #fff;">
+              <i class="fas fa-shapes" style="color: #60a5fa;"></i> <span id="txt-geom-title">Geometrização & Snapping</span>
+            </span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="chk-geom-snapping">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.35; margin: 0 0 8px 0;" id="txt-geom-desc">
+            Encaixa retas puras, cantos de 90° e círculos/elipses matemáticos perfeitos.
+          </p>
+          <div class="geom-sub-options" id="geom-sub-options" style="display: none; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.74rem; color: var(--text-secondary); cursor: pointer;">
+              <span><i class="fas fa-vector-square" style="color: #93c5fd; font-size: 0.7rem; margin-right: 5px;"></i> Retas e Cantos 90°</span>
+              <input type="checkbox" id="chk-geom-lines" checked style="accent-color: #3b82f6; width: 14px; height: 14px; cursor: pointer;">
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.74rem; color: var(--text-secondary); cursor: pointer;">
+              <span><i class="fas fa-circle-notch" style="color: #93c5fd; font-size: 0.7rem; margin-right: 5px;"></i> Círculos e Arcos Perfeitos</span>
+              <input type="checkbox" id="chk-geom-circles" checked style="accent-color: #3b82f6; width: 14px; height: 14px; cursor: pointer;">
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.74rem; color: var(--text-secondary); cursor: pointer;">
+              <span><i class="fas fa-bezier-curve" style="color: #93c5fd; font-size: 0.7rem; margin-right: 5px;"></i> Suavizar Curvas Bézier (G¹)</span>
+              <input type="checkbox" id="chk-geom-tangents" checked style="accent-color: #3b82f6; width: 14px; height: 14px; cursor: pointer;">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Geometric Precision Sliders -->
+      <div class="sidebar-section">
+        <div class="sidebar-title" id="txt-title-adjustments">Ajustes Geométricos</div>
+        
+        <div class="control-item">
+          <div class="control-label">
+            <span id="txt-lbl-lines">Forçar Linhas Retas</span>
+            <span class="val" id="val-lines">1.2 px</span>
+          </div>
+          <input type="range" class="slider" id="slider-lines" min="0.5" max="3.0" step="0.1" value="1.2">
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span id="txt-lbl-smooth">Suavização de Curvas</span>
+            <span class="val" id="val-smooth">1.5</span>
+          </div>
+          <input type="range" class="slider" id="slider-smooth" min="0.5" max="3.5" step="0.1" value="1.5">
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span id="txt-lbl-denoise">Filtro de Ruído JPEG</span>
+            <span class="val" id="val-denoise">1</span>
+          </div>
+          <input type="range" class="slider" id="slider-denoise" min="0" max="3" step="1" value="1">
+        </div>
+      </div>
+
+      <!-- Colors -->
+      <div class="sidebar-section">
+        <div class="sidebar-title" id="txt-title-colors">Paleta de Cores</div>
+        
+        <div class="control-item" style="margin-bottom: 12px;">
+          <div class="control-label">
+            <span id="txt-lbl-num-colors">Número de Cores</span>
+            <span class="val" id="val-num-colors">Auto (Gradiente)</span>
+          </div>
+          <div class="color-pills" id="color-pills">
+            <button class="color-pill" data-colors="2">2</button>
+            <button class="color-pill" data-colors="4">4</button>
+            <button class="color-pill" data-colors="8">8</button>
+            <button class="color-pill" data-colors="16">16</button>
+            <button class="color-pill active" data-colors="auto" id="pill-auto" title="Preservar tons da imagem">Auto</button>
+          </div>
+          <input type="range" class="slider" id="slider-colors" min="2" max="32" step="1" value="32">
+        </div>
+
+        <div class="gradient-control">
+          <label class="export-field" for="gradient-quality">Transições de cor (paleta Auto)
+            <select class="form-control" id="gradient-quality" aria-describedby="gradient-help">
+              <option value="balanced">Equilibradas — arquivo menor</option>
+              <option value="smooth" selected>Suaves — mais detalhes</option>
+            </select>
+          </label>
+          <p class="field-help" id="gradient-help">Suaves preserva mais tons para reduzir faixas no degradê. O SVG pode ficar maior.</p>
+        </div>
+        <div class="control-label" style="margin-top: 6px; margin-bottom: 4px;">
+          <span id="txt-color-detected">Cores na Paleta</span>
+          <span style="font-size: 0.78rem; color: var(--accent-cyan); font-weight: 600;" id="txt-palette-count">8 cores</span>
+        </div>
+        <div id="palette-swatches-container" class="palette-swatches-grid"></div>
+
+        <label class="checkbox-item" style="margin-top: 4px;">
+          <input type="checkbox" id="chk-transparent">
+          <span id="txt-chk-transparent">Fundo Transparente</span>
+        </label>
+      </div>
+
+      <!-- Export Actions -->
+      <div class="export-section">
+        <div class="export-settings">
+          <h3>PDF / EPS / DXF — tamanho de saída</h3>
+          <div class="export-fields">
+            <label class="export-field" for="export-width">Largura
+              <input class="form-control" id="export-width" type="number" min="0.01" step="0.1" value="100">
+            </label>
+            <label class="export-field" for="export-unit">Unidade
+              <select class="form-control" id="export-unit"><option value="mm">Milímetros</option><option value="in">Polegadas</option></select>
+            </label>
+            <label class="export-field export-field-wide" for="export-tolerance">Tolerância DXF
+              <input class="form-control" id="export-tolerance" type="number" min="0.001" step="0.01" value="0.1" aria-describedby="export-hint">
+            </label>
+          </div>
+          <p class="field-help" id="export-hint">Tolerância na unidade escolhida. Altura proporcional; use a mesma unidade no programa de corte.</p>
+        </div>
+        <button class="btn-action btn-download-svg" id="btn-download-svg">
+          <i class="fas fa-download"></i> <span id="txt-btn-svg">Baixar SVG (Vetor Infinito)</span>
+        </button>
+        <button class="btn-action btn-download-png" id="btn-download-png">
+          <i class="fas fa-file-image"></i> <span id="txt-btn-png">Baixar PNG Alta Resolução (4×)</span>
+        </button>
+
+        <!-- Formatos Gráficos & Industriais (Passo 5) -->
+        <div class="industrial-export-divider">
+          <span class="industrial-export-label" id="txt-industrial-label">Formatos Gráficos & Industriais</span>
+          <span class="badge-pro">PRO</span>
+        </div>
+        <div class="btn-industrial-row">
+          <button class="btn-ind btn-download-pdf" id="btn-download-pdf" title="PDF Vetorial pronto para gráficas offset e digitais">
+            <i class="fas fa-file-pdf"></i>
+            <span class="btn-ind-fmt">PDF Vetor</span>
+            <span class="btn-ind-sub" id="txt-pdf-sub">Gráfica / Offset</span>
+          </button>
+          <button class="btn-ind btn-download-eps" id="btn-download-eps" title="EPS universal para CorelDraw X7/X8+ e birôs RIP">
+            <i class="fas fa-layer-group"></i>
+            <span class="btn-ind-fmt">EPS</span>
+            <span class="btn-ind-sub" id="txt-eps-sub">CorelDraw</span>
+          </button>
+          <button class="btn-ind btn-download-dxf" id="btn-download-dxf" title="DXF R12 para corte a laser, CNC e plotters de vinil">
+            <i class="fas fa-drafting-compass"></i>
+            <span class="btn-ind-fmt">DXF</span>
+            <span class="btn-ind-sub" id="txt-dxf-sub">Laser & CNC</span>
+          </button>
+        </div>
+
+        <button class="btn-action btn-open-illus" id="btn-open-illus">
+          <i class="fas fa-pen-nib"></i> <span id="txt-btn-illus">Abrir no IllustratorClone</span>
+        </button>
+        <button class="btn-header" id="btn-new-image" style="justify-content: center; margin-top: 4px;">
+          <i class="fas fa-redo"></i> <span id="txt-btn-new">Carregar Outra Imagem</span>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= HELP MODAL ================= -->
+  <div class="modal-backdrop" id="help-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="txt-modal-title"><i class="fas fa-info-circle"></i> Sobre o VectorAI</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div style="line-height: 1.6; font-size: 0.9rem; color: #d1d5db;" id="txt-modal-body">
+        <p><strong>VectorAI</strong> é um motor de vetorização de altíssima precisão baseado em pesquisa de ponta do <em>Stanford AI Lab</em>.</p>
+        <br>
+        <p><strong>Por que é diferente?</strong><br>
+        Ferramentas gratuitas comuns cortam os pixels bruscamente, criando bordas onduladas em diagonais. O VectorAI utiliza <em>Sub-pixel Anti-aliasing Inversion</em> e ajuste híbrido de retas e curvas de Bézier cúbicas (Algoritmo de Philip J. Schneider). Isso significa que uma reta diagonal é traçada com 2 nós perfeitos, eliminando totalmente qualquer deformação gerada pela baixa resolução da imagem.</p>
+        <br>
+        <p><strong>Recursos Principais:</strong><br>
+        • <strong>Recorte de Fundo IA:</strong> Isola o objeto principal e elimina fundos falsos (xadrez fake PNG, brancos e sombras) via rede neural U²-Net antes do traçado vetorial.<br>
+        • <strong>Super-Resolução IA 4x:</strong> Restaura arestas e microdetalhes via Real-ESRGAN.<br>
+        • <strong>Geometrização & Snapping:</strong> Encaixa retas ortogonais, cantos de 90° e círculos perfeitos.<br>
+        • <strong>Formatos Industriais:</strong> Exporta para PDF Vetorial, EPS (CorelDraw) e DXF (Laser/CNC).</p>
+        <br>
+        <p><strong>Dicas:</strong><br>
+        • Para logotipos e tipografia, mantenha o modo <em>Logotipo / Geométrico</em> ativo.<br>
+        • Use o botão <em>Abrir no IllustratorClone</em> para continuar editando os nós diretamente no nosso aplicativo de ilustração.</p>
+        <br>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 12px 0;">
+        <p style="font-size: 0.82rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+          🌐 Links Oficiais & Ecossistema 4U.IA.BR
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; font-size: 0.8rem;">
+          <a href="https://4u.ia.br/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-home"></i> Portal 4U.IA.BR</a>
+          <a href="https://4u.ia.br/loja/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-store"></i> Loja de Apps</a>
+          <a href="https://4u-labs.github.io/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-terminal"></i> Blog Oficial / Dev</a>
+          <a href="https://4u.ia.br/termos.html" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-file-contract"></i> Termos de Uso</a>
+          <a href="https://4u.ia.br/politica.html" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-shield-alt"></i> Privacidade</a>
+          <a href="https://4u.ia.br/sobre.html" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-scroll"></i> Manifesto</a>
+          <a href="https://4u.ia.br/suporte.html" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-headset"></i> Central de Ajuda</a>
+          <a href="https://github.com/4u-Labs" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fab fa-github"></i> GitHub (4u-Labs)</a>
+          <a href="https://www.youtube.com/@fbr4g4" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fab fa-youtube"></i> YouTube</a>
+          <a href="https://www.instagram.com/fbr4g4/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fab fa-instagram"></i> Instagram</a>
+          <a href="https://www.linkedin.com/in/fbr4g4/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fab fa-linkedin"></i> LinkedIn</a>
+          <a href="https://x.com/fbr4g4" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fab fa-x-twitter"></i> X (Twitter)</a>
+          <a href="https://www.facebook.com/fbr4g4/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fab fa-facebook"></i> Facebook</a>
+          <a href="https://alternativeto.net/user/4u-ia-br/added/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; display: flex; align-items: center; gap: 5px;"><i class="fas fa-exchange-alt"></i> AlternativeTo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./processing_utils.js?v=3.4.0"></script>
+  <script src="./worker_engine.js?v=3.4.0"></script>
+  <script src="./vtracer_web.js?v=3.4.0"></script>
+  <script src="./geometric_snapper.js?v=3.4.0"></script>
+  <script src="./bg_remover.js?v=3.4.0"></script>
+  <script src="./industrial_exporter.js?v=3.4.0"></script>
+  <script src="./vector_engine.js?v=3.4.0"></script>
+  <script src="./ai_upscaler.js?v=3.4.0"></script>
+  <script>
+    // Pre-load VTracer WebAssembly in background
+    if (window.VTracer) {
+      window.VTracer.init('./vtracer_wasm_bg.wasm').catch(console.warn);
+    }
+
+    // --- STATE MANAGEMENT ---
+    let activeController = null, processingVersion = 0;
+    function cancelProcessing(message = 'Processamento cancelado.') {
+      processingVersion++; activeController?.abort(); activeController=null;
+      clearTimeout(debounceTimer);
+      document.getElementById('spinner').classList.remove('active');
+      document.getElementById('processing-status').textContent=message;
+    }
+    let currentImage = null;
+    let currentSvgString = '';
+    let rawSvgString = '';
+    let currentWidth = 0;
+    let currentHeight = 0;
+    let currentPalette = null;
+    let currentNumColors = 'auto';
+    let zoomLevel = 1.0;
+    let panX = 0, panY = 0;
+    let isPanning = false;
+    let startPanX = 0, startPanY = 0;
+    let viewMode = 'split';
+    let splitPos = 0.5; // 50%
+    let isDraggingSplit = false;
+    let currentLang = 'pt';
+    const engine = new WorkerEngine();
+    const aiUpscaler = new AIUpscaler();
+    const bgRemover = new BackgroundRemover();
+    const industrialExporter = new IndustrialExporter();
+
+    document.getElementById('btn-cancel').onclick=()=>cancelProcessing();
+    document.getElementById('btn-retry').onclick=()=>{bgRemover.cache.clear();aiUpscaler.cache?.clear();runVectorization();};
+    // --- I18N DICTIONARY ---
+    const i18n = {
+      pt: {
+        donate: '<i class="fab fa-paypal"></i> Apoiar',
+        install: 'Instalar App',
+        help: 'Ajuda',
+        dropTitle: 'Arraste uma imagem aqui',
+        dropSub: 'ou clique para selecionar (JPG, PNG, WEBP)',
+        browse: 'Escolher Imagem',
+        sampleLabel: 'Ou teste instantaneamente:',
+        processing: 'Calculando curvas de Bézier e retas sub-pixel...',
+        titlePresets: 'Modo de Vetorização',
+        presetLogo: 'Logotipo (2 Cores)',
+        presetArt: 'Ilustração (Multi-Cores)',
+        titleAdj: 'Ajustes Geométricos',
+        geomTitle: 'Geometrização & Snapping',
+        geomDesc: 'Encaixa retas puras, cantos de 90° e círculos/elipses matemáticos perfeitos.',
+        titleColors: 'Paleta de Cores',
+        lblNumColors: 'Número de Cores',
+        lblColorsDetected: 'Cores na Paleta',
+        lblLines: 'Forçar Linhas Retas',
+        lblSmooth: 'Suavização de Curvas',
+        lblDenoise: 'Filtro de Ruído JPEG',
+        chkTransparent: 'Fundo Transparente',
+        btnSvg: 'Baixar SVG (Vetor Infinito)',
+        btnPng: 'Baixar PNG Alta Resolução (4×)',
+        lblIndustrial: 'Formatos Gráficos & Industriais',
+        subPdf: 'Gráfica / Offset',
+        subEps: 'CorelDraw',
+        subDxf: 'Laser & CNC',
+        aiBgTitle: 'Recorte de Fundo IA',
+        aiBgDesc: 'Isola o objeto principal e elimina fundos falsos (xadrez fake, brancos e sombras).',
+        aiBgMode: 'Modo de Recorte',
+        aiBgModeAuto: '⚡ Auto Inteligente (Recomendado)',
+        aiBgModeCorners: '🏷️ Quinas & Bordas (Ícones, Logos & Cards)',
+        aiBgModeNeural: '🧠 IA Profunda (Fotos & Pessoas)',
+        aiBgTol: 'Tolerância do Fundo',
+        btnIllus: 'Abrir no IllustratorClone',
+        btnNew: 'Carregar Outra Imagem',
+        modalTitle: '<i class="fas fa-info-circle"></i> Sobre o VectorAI'
+      },
+      en: {
+        donate: '<i class="fab fa-paypal"></i> Support',
+        install: 'Install App',
+        help: 'Help',
+        dropTitle: 'Drag and drop an image here',
+        dropSub: 'or click to browse (JPG, PNG, WEBP)',
+        browse: 'Choose Image',
+        sampleLabel: 'Or test instantly with sample:',
+        processing: 'Computing Bézier curves and sub-pixel lines...',
+        titlePresets: 'Vectorization Mode',
+        presetLogo: 'Logo (2 Colors)',
+        presetArt: 'Illustration (Multi-Colors)',
+        titleAdj: 'Geometric Adjustments',
+        geomTitle: 'Geometrization & Snapping',
+        geomDesc: 'Snaps pure lines, 90° right angles and mathematical circles/ellipses.',
+        titleColors: 'Color Palette',
+        lblNumColors: 'Number of Colors',
+        lblColorsDetected: 'Colors in Palette',
+        lblLines: 'Snap to Straight Lines',
+        lblSmooth: 'Curve Smoothing',
+        lblDenoise: 'JPEG Denoise Filter',
+        chkTransparent: 'Transparent Background',
+        btnSvg: 'Download SVG (Infinite Vector)',
+        btnPng: 'Download High-Res PNG (4×)',
+        lblIndustrial: 'Industrial & Print Formats',
+        subPdf: 'Print / Offset',
+        subEps: 'CorelDraw',
+        subDxf: 'Laser & CNC',
+        aiBgTitle: 'AI Background Cut',
+        aiBgDesc: 'Isolates central object and removes fake checkerboards, white and shadows.',
+        aiBgMode: 'Cutout Mode',
+        aiBgModeAuto: '⚡ Smart Auto (Recommended)',
+        aiBgModeCorners: '🏷️ Corners & Borders (Icons, Logos & Cards)',
+        aiBgModeNeural: '🧠 Deep Neural AI (Photos & People)',
+        aiBgTol: 'Background Tolerance',
+        btnIllus: 'Open in IllustratorClone',
+        btnNew: 'Upload Another Image',
+        modalTitle: '<i class="fas fa-info-circle"></i> About VectorAI'
+      }
+    };
+
+    function applyLang(lang) {
+      document.getElementById("txt-compare").textContent = lang === "en" ? "Side by side" : "Lado a lado";
+      document.getElementById("txt-current").textContent = lang === "en" ? "Current version" : "Versão atual";
+      currentLang = lang;
+      const t = i18n[lang] || i18n.pt;
+      document.getElementById('txt-donate').innerHTML = t.donate;
+      document.getElementById('txt-install').textContent = t.install;
+      document.getElementById('txt-help').textContent = t.help;
+      document.getElementById('txt-drop-title').textContent = t.dropTitle;
+      document.getElementById('txt-drop-sub').textContent = t.dropSub;
+      document.getElementById('txt-browse').textContent = t.browse;
+      const elSample = document.getElementById('txt-sample-label');
+      if (elSample) elSample.textContent = t.sampleLabel;
+      document.getElementById('txt-processing').textContent = t.processing;
+      document.getElementById('txt-title-presets').textContent = t.titlePresets;
+      const elPresetLogo = document.getElementById('txt-preset-logo');
+      if (elPresetLogo) elPresetLogo.textContent = t.presetLogo;
+      const elPresetArt = document.getElementById('txt-preset-art');
+      if (elPresetArt) elPresetArt.textContent = t.presetArt;
+      document.getElementById('txt-title-adjustments').textContent = t.titleAdj;
+      const elGeomTitle = document.getElementById('txt-geom-title');
+      if (elGeomTitle) elGeomTitle.textContent = t.geomTitle;
+      const elGeomDesc = document.getElementById('txt-geom-desc');
+      if (elGeomDesc) elGeomDesc.textContent = t.geomDesc;
+      document.getElementById('txt-title-colors').textContent = t.titleColors;
+      const elNumColors = document.getElementById('txt-lbl-num-colors');
+      if (elNumColors) elNumColors.textContent = t.lblNumColors;
+      const elColorsDetected = document.getElementById('txt-color-detected');
+      if (elColorsDetected) elColorsDetected.textContent = t.lblColorsDetected;
+      document.getElementById('txt-lbl-lines').textContent = t.lblLines;
+      document.getElementById('txt-lbl-smooth').textContent = t.lblSmooth;
+      document.getElementById('txt-lbl-denoise').textContent = t.lblDenoise;
+      document.getElementById('txt-chk-transparent').textContent = t.chkTransparent;
+      const elAiBgTitle = document.getElementById('txt-ai-bg-title');
+      if (elAiBgTitle) elAiBgTitle.textContent = t.aiBgTitle;
+      const elAiBgDesc = document.getElementById('txt-ai-bg-desc');
+      if (elAiBgDesc) elAiBgDesc.textContent = t.aiBgDesc;
+      const elAiBgModeLbl = document.getElementById('lbl-ai-bg-mode');
+      if (elAiBgModeLbl) elAiBgModeLbl.textContent = t.aiBgMode;
+      const elOptAuto = document.getElementById('opt-ai-bg-auto');
+      if (elOptAuto) elOptAuto.textContent = t.aiBgModeAuto;
+      const elOptCorners = document.getElementById('opt-ai-bg-corners');
+      if (elOptCorners) elOptCorners.textContent = t.aiBgModeCorners;
+      const elOptNeural = document.getElementById('opt-ai-bg-neural');
+      if (elOptNeural) elOptNeural.textContent = t.aiBgModeNeural;
+      const elAiBgTolLbl = document.getElementById('lbl-ai-bg-tol');
+      if (elAiBgTolLbl) elAiBgTolLbl.textContent = t.aiBgTol;
+      document.getElementById('txt-btn-svg').textContent = t.btnSvg;
+      document.getElementById('txt-btn-png').textContent = t.btnPng;
+      const elIndLabel = document.getElementById('txt-industrial-label');
+      if (elIndLabel) elIndLabel.textContent = t.lblIndustrial;
+      const elPdfSub = document.getElementById('txt-pdf-sub');
+      if (elPdfSub) elPdfSub.textContent = t.subPdf;
+      const elEpsSub = document.getElementById('txt-eps-sub');
+      if (elEpsSub) elEpsSub.textContent = t.subEps;
+      const elDxfSub = document.getElementById('txt-dxf-sub');
+      if (elDxfSub) elDxfSub.textContent = t.subDxf;
+      document.getElementById('txt-btn-illus').textContent = t.btnIllus;
+      document.getElementById('txt-btn-new').textContent = t.btnNew;
+      document.getElementById('txt-modal-title').innerHTML = t.modalTitle;
+    }
+
+    // Auto-detect browser language
+    const userLang = (navigator.language || navigator.userLanguage || 'pt').toLowerCase();
+    if (!userLang.startsWith('pt')) applyLang('en');
+
+    document.getElementById('btn-lang').addEventListener('click', () => {
+      applyLang(currentLang === 'pt' ? 'en' : 'pt');
+    });
+
+    // --- UPLOAD & SAMPLES ---
+    const fileInput = document.getElementById('file-input');
+    const dropzone = document.getElementById('dropzone');
+
+    document.getElementById('btn-browse').addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        loadImageFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        loadImageFile(e.target.files[0]);
+      }
+    });
+
+    window.addEventListener('paste', (e) => {
+      if (e.clipboardData && e.clipboardData.items) {
+        for (const item of e.clipboardData.items) {
+          if (item.type.indexOf('image') !== -1) {
+            loadImageFile(item.getAsFile());
+            break;
+          }
+        }
+      }
+    });
+
+    const btnSample = document.getElementById('btn-sample-i9');
+    if (btnSample) {
+      btnSample.addEventListener('click', () => {
+        setNumColors(2);
+        const img = new Image();
+        img.onload = () => handleImageLoaded(img);
+        img.src = './sample_i9.jpg';
+      });
+    }
+
+    function loadImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => handleImageLoaded(img);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleImageLoaded(img) {
+      cancelProcessing('Imagem carregada.');
+      currentSvgString=''; rawSvgString='';
+      document.getElementById('svg-container').replaceChildren();
+      currentImage = img;
+      currentWidth = img.naturalWidth || img.width;
+      currentHeight = img.naturalHeight || img.height;
+
+      // Auto-suggest AI Super-Resolution for low-res / compact images (<= 350px)
+      const chkAi = document.getElementById('chk-ai-upscale');
+      if (chkAi && (currentWidth <= 350 || currentHeight <= 350)) {
+        chkAi.checked = true;
+      }
+
+      // Update UI state
+      document.getElementById('upload-state').style.display = 'none';
+      document.getElementById('viewer-toolbar').style.display = 'flex';
+      document.getElementById('sidebar').style.display = 'flex';
+      document.getElementById('stage').style.display = 'block';
+
+      // Setup container dimensions
+      const stageContainer = document.getElementById('stage-container');
+      stageContainer.style.width = currentWidth + 'px';
+      stageContainer.style.height = currentHeight + 'px';
+
+      document.getElementById('img-original').src = img.src;
+
+      // Initial fit zoom
+      updateSplitView();
+      fitStageToViewport();
+
+      // Trigger vectorization
+      runVectorization();
+    }
+
+    // --- VECTORIZATION PIPELINE ---
+    let debounceTimer = null;
+    function triggerRevectorize() {
+      cancelProcessing('Atualizando ajustes…');
+      debounceTimer = setTimeout(runVectorization, 250);
+    }
+
+    async function runVectorization() {
+      if (!currentImage) return;
+      cancelProcessing('Processando…');
+      const version=processingVersion;
+      const controller=new AbortController(); activeController=controller;
+      const signal=controller.signal;
+      const methods=[];
+      const status=(msg)=>{if(version===processingVersion) document.getElementById('txt-processing').textContent=msg;};
+      const check=()=>{Processing.check(signal);if(version!==processingVersion) throw new DOMException('Cancelado','AbortError');};
+      try {
+      const spinner = document.getElementById('spinner');
+      const spinnerText = document.getElementById('txt-processing');
+      spinner.classList.add('active');
+
+      const isLogo = document.getElementById('preset-logo').classList.contains('active');
+      const useAiBg = document.getElementById('chk-ai-bg') && document.getElementById('chk-ai-bg').checked;
+      const useAiUpscale = document.getElementById('chk-ai-upscale') && document.getElementById('chk-ai-upscale').checked;
+
+      let vectorSource = currentImage;
+
+      // 1. Recorte Inteligente de Fundo com IA (AI Background Isolation)
+      if (useAiBg) {
+        const bgMode = document.getElementById('sel-ai-bg-mode') ? document.getElementById('sel-ai-bg-mode').value : 'auto';
+        const bgTol = document.getElementById('slider-ai-bg-tol') ? parseFloat(document.getElementById('slider-ai-bg-tol').value) : 35;
+        if (spinnerText) spinnerText.textContent = bgMode === 'corners' ? '✂️ Recortando quinas e fundo externo...' : '✂️ Isolando objeto e removendo fundo com IA...';
+        try {
+          vectorSource = await bgRemover.removeBackground(vectorSource, { mode: bgMode, tolerance: bgTol, signal }, (msg) => {
+            status(msg);
+          });
+          check(); methods.push(vectorSource.processingMethod);
+          const chkTrans = document.getElementById('chk-transparent');
+          if (chkTrans) chkTrans.checked = true;
+        } catch (err) {
+          check(); throw new Error('Falha na remoção do fundo: ' + err.message);
+        }
+      }
+
+      // 2. Super-Resolução com IA (Real-ESRGAN 4x)
+      if (useAiUpscale) {
+        if (spinnerText) spinnerText.textContent = '✨ Aplicando Super-Resolução com IA (Real-ESRGAN 4x)...';
+        try {
+          vectorSource = await aiUpscaler.upscale(vectorSource, (msg) => {
+            status(msg);
+          }, signal);
+          check(); methods.push(vectorSource.processingMethod);
+        } catch (err) {
+          check(); throw new Error('Falha na ampliação: ' + err.message);
+        }
+      }
+
+      if (spinnerText) spinnerText.textContent = 'Calculando curvas de Bézier e retas sub-pixel...';
+
+      const useGeom = document.getElementById('chk-geom-snapping') && document.getElementById('chk-geom-snapping').checked;
+
+      const options = {
+        mode: isLogo ? 'logo' : 'art',
+        numColors: currentNumColors,
+        gradientQuality: document.getElementById('gradient-quality').value,
+        originalWidth: currentWidth,
+        originalHeight: currentHeight,
+        lineTolerance: parseFloat(document.getElementById('slider-lines').value),
+        bezierTolerance: parseFloat(document.getElementById('slider-smooth').value),
+        denoise: parseInt(document.getElementById('slider-denoise').value),
+        transparentBg: document.getElementById('chk-transparent').checked,
+        geometricSnapping: useGeom,
+        snapOrthogonal: document.getElementById('chk-geom-lines') ? document.getElementById('chk-geom-lines').checked : true,
+        snapRightAngles: document.getElementById('chk-geom-lines') ? document.getElementById('chk-geom-lines').checked : true,
+        detectCircles: document.getElementById('chk-geom-circles') ? document.getElementById('chk-geom-circles').checked : true,
+        detectEllipses: document.getElementById('chk-geom-circles') ? document.getElementById('chk-geom-circles').checked : true,
+        smoothTangents: document.getElementById('chk-geom-tangents') ? document.getElementById('chk-geom-tangents').checked : true
+      };
+
+      try {
+        const res = await engine.process(vectorSource, options, signal);
+        check();
+        rawSvgString = res.rawSvgString || res.svgString;
+        currentSvgString = res.svgString;
+        currentPalette = res.palette;
+
+        // Render SVG into stage
+        document.getElementById('svg-container').innerHTML = res.svgString;
+
+        // Render dynamic palette swatches
+        renderPaletteSwatches(res.palette);
+
+        updateSplitView();
+        methods.push(res.engine === 'vtracer_wasm' ? 'Vetorização VTracer' : 'Vetorização alternativa JavaScript');
+        document.getElementById('processing-status').textContent=methods.filter(Boolean).join(' • ') + ` • ${vectorSource.naturalWidth || vectorSource.width} × ${vectorSource.naturalHeight || vectorSource.height} px`;
+      } catch(err) { throw err; }
+      } catch(err) {
+        if(version===processingVersion && err.name!=='AbortError') document.getElementById('processing-status').textContent='Erro: '+err.message+' — use Tentar novamente.';
+      } finally {
+        if(version===processingVersion) {document.getElementById('spinner').classList.remove('active');activeController=null;}
+      }
+    }
+
+    function applyGeometricSnapping() {
+      if(activeController) {triggerRevectorize();return;}
+      if (!rawSvgString) return;
+      const useGeom = document.getElementById('chk-geom-snapping') && document.getElementById('chk-geom-snapping').checked;
+      if (!useGeom || typeof GeometricSnapper === 'undefined') {
+        currentSvgString = rawSvgString;
+      } else {
+        try {
+          // Compute coordinate scale ratio between SVG viewBox and original display width
+          let scaleFactor = 1.0;
+          const vbMatch = rawSvgString.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
+          if (vbMatch && currentWidth > 0) {
+            const vbWidth = parseFloat(vbMatch[1]);
+            if (vbWidth > 0) scaleFactor = vbWidth / currentWidth;
+          }
+
+          const linesChecked = document.getElementById('chk-geom-lines') ? document.getElementById('chk-geom-lines').checked : true;
+          const baseTol = parseFloat(document.getElementById('slider-lines').value) || 1.2;
+
+          const snapper = new GeometricSnapper({
+            snapOrthogonal: linesChecked,
+            snapRightAngles: linesChecked,
+            detectCircles: document.getElementById('chk-geom-circles') ? document.getElementById('chk-geom-circles').checked : true,
+            detectEllipses: document.getElementById('chk-geom-circles') ? document.getElementById('chk-geom-circles').checked : true,
+            smoothTangents: document.getElementById('chk-geom-tangents') ? document.getElementById('chk-geom-tangents').checked : true,
+            flatBezierTolerance: linesChecked ? (baseTol * scaleFactor) : 0
+          });
+          currentSvgString = snapper.regularizeSvg(rawSvgString);
+        } catch (err) {
+          console.warn('Geometric snapping error:', err);
+          currentSvgString = rawSvgString;
+        }
+      }
+
+      // Defensive viewBox & responsive sizing safeguard
+      if (!currentSvgString.includes('viewBox')) {
+        const vbMatch = rawSvgString && rawSvgString.match(/viewBox="([^"]+)"/);
+        const vb = vbMatch ? vbMatch[1] : `0 0 ${currentWidth || 320} ${currentHeight || 320}`;
+        currentSvgString = currentSvgString.replace('<svg ', `<svg viewBox="${vb}" `);
+      }
+      currentSvgString = currentSvgString.replace(/width="[^"]*"/, 'width="100%"').replace(/height="[^"]*"/, 'height="100%"');
+
+      document.getElementById('svg-container').innerHTML = currentSvgString;
+      updateSplitView();
+    }
+
+    function renderPaletteSwatches(palette) {
+      const container = document.getElementById('palette-swatches-container');
+      const countLabel = document.getElementById('txt-palette-count');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!Array.isArray(palette) || palette.length === 0) {
+        if (countLabel) countLabel.textContent = '0 cores';
+        return;
+      }
+
+      if (countLabel) {
+        countLabel.textContent = `${palette.length} ${palette.length === 1 ? 'cor' : 'cores'}`;
+      }
+
+      palette.forEach((p) => {
+        const swatch = document.createElement('div');
+        swatch.className = 'palette-swatch-item';
+        swatch.style.background = p.color;
+        swatch.title = `${p.color} (${p.percent || ''}%)`;
+        container.appendChild(swatch);
+      });
+    }
+
+    function setNumColors(n) {
+      if (n === 'auto' || n === 'max' || isNaN(parseInt(n))) {
+        currentNumColors = 'auto';
+      } else {
+        currentNumColors = parseInt(n);
+      }
+      const slider = document.getElementById('slider-colors');
+      const valLabel = document.getElementById('val-num-colors');
+      if (slider) slider.value = (currentNumColors === 'auto') ? 32 : currentNumColors;
+      if (valLabel) valLabel.textContent = (currentNumColors === 'auto') ? 'Auto (Gradiente)' : currentNumColors;
+
+      document.getElementById('gradient-quality').disabled=currentNumColors!=='auto';
+      // Update pills
+      document.querySelectorAll('.color-pill').forEach(btn => {
+        const isMatch = (btn.dataset.colors === 'auto' && currentNumColors === 'auto') ||
+                        (parseInt(btn.dataset.colors) === currentNumColors);
+        btn.classList.toggle('active', isMatch);
+      });
+
+      // Update presets
+      const btnLogo = document.getElementById('preset-logo');
+      const btnArt = document.getElementById('preset-art');
+      if (btnLogo && btnArt) {
+        if (currentNumColors === 2) {
+          btnLogo.classList.add('active');
+          btnArt.classList.remove('active');
+        } else {
+          btnArt.classList.add('active');
+          btnLogo.classList.remove('active');
+        }
+      }
+
+      triggerRevectorize();
+    }
+
+    document.querySelectorAll('.color-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setNumColors(btn.dataset.colors);
+      });
+    });
+
+    document.getElementById('slider-colors').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      if (val >= 32) {
+        setNumColors('auto');
+      } else {
+        setNumColors(val);
+      }
+    });
+
+    document.getElementById('gradient-quality').addEventListener('change', triggerRevectorize);
+    // --- SLIDERS INTERACTION ---
+    document.getElementById('slider-lines').addEventListener('input', (e) => {
+      document.getElementById('val-lines').textContent = e.target.value + ' px';
+      triggerRevectorize();
+    });
+
+    document.getElementById('slider-smooth').addEventListener('input', (e) => {
+      document.getElementById('val-smooth').textContent = e.target.value;
+      triggerRevectorize();
+    });
+
+    document.getElementById('slider-denoise').addEventListener('input', (e) => {
+      document.getElementById('val-denoise').textContent = e.target.value;
+      triggerRevectorize();
+    });
+
+    document.getElementById('chk-transparent').addEventListener('change', () => {
+      triggerRevectorize();
+    });
+
+    const chkAiUpscale = document.getElementById('chk-ai-upscale');
+    if (chkAiUpscale) {
+      chkAiUpscale.addEventListener('change', () => {
+        triggerRevectorize();
+      });
+    }
+
+    const chkAiBg = document.getElementById('chk-ai-bg');
+    const aiBgOptions = document.getElementById('ai-bg-options');
+    const selAiBgMode = document.getElementById('sel-ai-bg-mode');
+    const sliderAiBgTol = document.getElementById('slider-ai-bg-tol');
+    const valAiBgTol = document.getElementById('val-ai-bg-tol');
+
+    if (chkAiBg) {
+      chkAiBg.addEventListener('change', () => {
+        if (aiBgOptions) aiBgOptions.style.display = chkAiBg.checked ? 'block' : 'none';
+        triggerRevectorize();
+      });
+    }
+
+    if (selAiBgMode) {
+      selAiBgMode.addEventListener('change', () => {
+        triggerRevectorize();
+      });
+    }
+
+    if (sliderAiBgTol) {
+      sliderAiBgTol.addEventListener('input', (e) => {
+        if (valAiBgTol) valAiBgTol.textContent = e.target.value;
+        triggerRevectorize();
+      });
+    }
+
+    // Geometrization event listeners (Passo 2)
+    const chkGeom = document.getElementById('chk-geom-snapping');
+    if (chkGeom) {
+      chkGeom.addEventListener('change', (e) => {
+        const sub = document.getElementById('geom-sub-options');
+        if (sub) sub.style.display = e.target.checked ? 'flex' : 'none';
+        applyGeometricSnapping();
+      });
+    }
+
+    ['chk-geom-lines', 'chk-geom-circles', 'chk-geom-tangents'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => {
+          applyGeometricSnapping();
+        });
+      }
+    });
+
+    // Preset buttons
+    document.getElementById('preset-logo').addEventListener('click', () => {
+      document.getElementById('slider-lines').value = 1.2;
+      document.getElementById('val-lines').textContent = '1.2 px';
+      document.getElementById('slider-smooth').value = 1.5;
+      document.getElementById('val-smooth').textContent = '1.5';
+      const g = document.getElementById('chk-geom-snapping');
+      if (g) g.checked = true;
+      const sub = document.getElementById('geom-sub-options');
+      if (sub) sub.style.display = 'flex';
+      setNumColors(2);
+    });
+
+    document.getElementById('preset-art').addEventListener('click', () => {
+      document.getElementById('slider-lines').value = 2.5;
+      document.getElementById('val-lines').textContent = '2.5 px';
+      document.getElementById('slider-smooth').value = 2.0;
+      document.getElementById('val-smooth').textContent = '2.0';
+      document.getElementById('chk-geom-snapping').checked=false;
+      document.getElementById('geom-sub-options').style.display='none';
+      document.getElementById('gradient-quality').value='smooth';
+      setNumColors('auto');
+    });
+
+    // --- ZOOM & PAN & SPLIT SLIDER ---
+    const viewport = document.getElementById('viewport');
+    const stage = document.getElementById('stage');
+    const splitDivider = document.getElementById('split-divider');
+    const stageVector = document.getElementById('stage-vector');
+    const stageOriginal = document.getElementById('stage-original');
+
+    function updateTransform() {
+      stage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+      stage.style.setProperty('--inverse-zoom', 1 / zoomLevel);
+      document.getElementById('txt-zoom').textContent = Math.round(zoomLevel * 100) + '%';
+    }
+
+    function fitStageToViewport() {
+      const vWidth = viewport.clientWidth - 80;
+      const vHeight = viewport.clientHeight - 80;
+      if (!currentWidth || !currentHeight) return;
+      const displayWidth = viewMode === 'compare' ? currentWidth * 2 + 24 : currentWidth;
+      zoomLevel = Math.max(0.01, Math.min(vWidth / displayWidth, vHeight / currentHeight, 2.5));
+      panX = 0; panY = 0;
+      updateTransform();
+    }
+
+    viewport.addEventListener('wheel', (e) => {
+      if (!currentImage) return;
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.85 : 1.15;
+      zoomLevel = Math.max(0.2, Math.min(32.0, zoomLevel * delta));
+      updateTransform();
+    });
+
+    viewport.addEventListener('mousedown', (e) => {
+      if (e.target.closest('#split-divider')) return;
+      isPanning = true;
+      startPanX = e.clientX - panX;
+      startPanY = e.clientY - panY;
+      viewport.classList.add('grabbing');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isPanning) {
+        panX = e.clientX - startPanX;
+        panY = e.clientY - startPanY;
+        updateTransform();
+      } else if (isDraggingSplit) {
+        const rect = document.getElementById('stage-container').getBoundingClientRect();
+        const clientX = e.clientX;
+        let pos = (clientX - rect.left) / rect.width;
+        pos = Math.max(0.0, Math.min(1.0, pos));
+        splitPos = pos;
+        updateSplitView();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPanning = false;
+      isDraggingSplit = false;
+      viewport.classList.remove('grabbing');
+    });
+
+    splitDivider.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      isDraggingSplit = true;
+    });
+
+    function updateSplitView() {
+      const paired = viewMode === 'compare';
+      const container = document.getElementById('stage-container');
+      container.style.width = (paired ? currentWidth * 2 + 24 : currentWidth) + 'px';
+      container.style.height = currentHeight + 'px';
+      container.classList.toggle('side-by-side', paired);
+      stageOriginal.style.width = stageVector.style.width = currentWidth + 'px';
+      stageVector.style.left = paired ? (currentWidth + 24) + 'px' : '0';
+      document.getElementById('compare-labels').hidden = !paired;
+      splitDivider.style.display = viewMode === 'split' ? 'block' : 'none';
+      stageOriginal.style.visibility = viewMode === 'vector' ? 'hidden' : 'visible';
+      stageVector.style.visibility = viewMode === 'original' ? 'hidden' : 'visible';
+      stageOriginal.style.clipPath = stageVector.style.clipPath = 'none';
+      if(viewMode === 'split') {
+        const pct = (splitPos * 100).toFixed(2);
+        splitDivider.style.left = pct + '%';
+        stageVector.style.clipPath = `polygon(${pct}% 0, 100% 0, 100% 100%, ${pct}% 100%)`;
+        stageOriginal.style.clipPath = `polygon(0 0, ${pct}% 0, ${pct}% 100%, 0 100%)`;
+      }
+    }
+
+    document.querySelectorAll('.view-mode-btn').forEach(btn => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.mode === viewMode));
+      btn.addEventListener('click', () => {
+        const resize = (viewMode === 'compare') !== (btn.dataset.mode === 'compare');
+        viewMode = btn.dataset.mode;
+        document.querySelectorAll('.view-mode-btn').forEach(b => {
+          b.classList.toggle('active', b === btn);
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+        updateSplitView();
+        if(resize) fitStageToViewport();
+      });
+    });
+
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      zoomLevel = Math.min(32.0, zoomLevel * 1.25);
+      updateTransform();
+    });
+
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      zoomLevel = Math.max(0.2, zoomLevel / 1.25);
+      updateTransform();
+    });
+
+    document.getElementById('btn-zoom-reset').addEventListener('click', fitStageToViewport);
+
+    // --- EXPORT ACTIONS ---
+    document.getElementById('btn-download-svg').addEventListener('click', () => {
+      if (!currentSvgString) return;
+      const blob = new Blob([currentSvgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vectorai_' + Date.now() + '.svg';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btn-download-png').addEventListener('click', () => {
+      if (!currentSvgString) return;
+      const canvas = document.createElement('canvas');
+      const scale = 4; // Four times the original dimensions
+      canvas.width = currentWidth * scale;
+      canvas.height = currentHeight * scale;
+      const ctx = canvas.getContext('2d');
+
+      const img = new Image();
+      const svgBlob = new Blob([currentSvgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          const pngUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = pngUrl;
+          a.download = 'vectorai_4x_' + Date.now() + '.png';
+          a.click();
+          URL.revokeObjectURL(pngUrl);
+          URL.revokeObjectURL(url);
+        });
+      };
+      img.src = url;
+    });
+
+    function exportOptions() {
+      const width=Number(document.getElementById('export-width').value);
+      const tolerance=Number(document.getElementById('export-tolerance').value);
+      if(!(width>0) || !(tolerance>0)) throw new Error('Largura e tolerância devem ser maiores que zero.');
+      return {width, unit:document.getElementById('export-unit').value, tolerance};
+    }
+    // --- INDUSTRIAL EXPORT ACTIONS (Passo 5) ---
+    document.getElementById('btn-download-pdf').addEventListener('click', () => {
+      if (!currentSvgString) return;
+      try {
+        industrialExporter.downloadPdf(currentSvgString, 'vectorai_grafica', exportOptions());
+      } catch (err) {
+        console.error('Erro ao exportar PDF:', err);
+        alert('Erro ao gerar PDF: ' + err.message);
+      }
+    });
+
+    document.getElementById('btn-download-eps').addEventListener('click', () => {
+      if (!currentSvgString) return;
+      try {
+        industrialExporter.downloadEps(currentSvgString, 'vectorai_corel', exportOptions());
+      } catch (err) {
+        console.error('Erro ao exportar EPS:', err);
+        alert('Erro ao gerar EPS: ' + err.message);
+      }
+    });
+
+    document.getElementById('btn-download-dxf').addEventListener('click', () => {
+      if (!currentSvgString) return;
+      try {
+        industrialExporter.downloadDxf(currentSvgString, 'vectorai_laser_cnc', exportOptions());
+      } catch (err) {
+        console.error('Erro ao exportar DXF:', err);
+        alert('Erro ao gerar DXF: ' + err.message);
+      }
+    });
+
+    document.getElementById('btn-open-illus').addEventListener('click', () => {
+      if (!currentSvgString) return;
+      // Store in localStorage for IllustratorClone to open
+      try {
+        localStorage.setItem('illusclone_import_svg', currentSvgString);
+      } catch (e) {}
+      window.open('../illusclone/', '_blank');
+    });
+
+    document.getElementById('btn-new-image').addEventListener('click', () => {
+      document.getElementById('upload-state').style.display = 'flex';
+      document.getElementById('viewer-toolbar').style.display = 'none';
+      document.getElementById('sidebar').style.display = 'none';
+      document.getElementById('stage').style.display = 'none';
+      fileInput.value = '';
+    });
+
+    // --- HELP MODAL ---
+    const helpModal = document.getElementById('help-modal');
+    document.getElementById('btn-help').addEventListener('click', () => helpModal.classList.add('open'));
+    document.getElementById('modal-close').addEventListener('click', () => helpModal.classList.remove('open'));
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) helpModal.classList.remove('open');
+    });
+
+    // --- PWA INSTALLATION ---
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('btn-pwa').style.display = 'inline-flex';
+    });
+
+    document.getElementById('btn-pwa').addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          document.getElementById('btn-pwa').style.display = 'none';
+        });
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+    }
+  </script>
+</body>
+</html>
