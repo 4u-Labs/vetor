@@ -850,6 +850,19 @@
     #compare-labels:not([hidden]) {position:absolute;top:12px;left:0;right:0;display:grid;grid-template-columns:1fr 1fr;text-align:center;z-index:15;pointer-events:none;color:#e5e7eb;font-size:.8rem;}
     #compare-labels span {justify-self:center;background:#171b29e8;border:1px solid #3a4258;border-radius:6px;padding:5px 12px;}
     .split-handle {width:38px;height:38px;font-size:1rem;transform:translate(-50%,-50%) scale(var(--inverse-zoom,1));touch-action:none;}
+    :is(button,a,input,select,[tabindex]):focus-visible {outline:3px solid #fbbf24 !important;outline-offset:3px;}
+    dialog.modal-backdrop {margin:0;border:0;width:100%;height:100%;max-width:none;max-height:none;padding:16px;}
+    dialog.modal-backdrop[open] {display:flex;}
+    dialog.modal-backdrop::backdrop {background:rgba(0,0,0,.6);}
+    .modal-card {max-height:calc(100dvh - 32px);overflow-y:auto;}
+    .modal-header {position:sticky;top:0;background:var(--bg-card,#171b29);z-index:1;}
+    #help-guide h4 {margin:20px 0 8px;color:#fff;}
+    #help-guide h4:first-child {margin-top:0;}
+    #help-guide p {margin:0 0 12px;}
+    #help-guide ul {padding-left:22px;}
+    #help-guide li {margin:8px 0;}
+    kbd {font:inherit;border:1px solid #64748b;border-radius:4px;padding:1px 4px;}
+    @media (prefers-reduced-motion:reduce) {* {animation:none !important;transition:none !important;}}
   </style>
 </head>
 <body>
@@ -868,7 +881,7 @@
       <button class="btn-header" id="btn-pwa" style="display:none;">
         <i class="fas fa-download"></i> <span id="txt-install">Instalar App</span>
       </button>
-      <button class="btn-header" id="btn-help">
+      <button class="btn-header" id="btn-help" aria-haspopup="dialog" aria-controls="help-modal">
         <i class="fas fa-question-circle"></i> <span id="txt-help">Ajuda</span>
       </button>
       <button class="btn-header" id="btn-lang">
@@ -907,7 +920,7 @@
       </div>
 
       <!-- Canvas Viewport -->
-      <div class="canvas-viewport" id="viewport">
+      <div class="canvas-viewport" id="viewport" tabindex="0" role="region" aria-label="Prévia da imagem: use mais e menos para zoom, zero para ajustar e setas para deslocar">
         <div id="compare-labels" hidden><span>Original</span><span id="txt-current">Versão atual</span></div>
         
         <!-- Empty Upload State -->
@@ -932,7 +945,7 @@
             <div class="stage-vector" id="stage-vector">
               <div id="svg-container"></div>
             </div>
-            <div class="split-divider" id="split-divider">
+            <div class="split-divider" id="split-divider" tabindex="0" role="slider" aria-label="Comparação entre original e vetor" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-orientation="horizontal">
               <div class="split-handle"><i class="fas fa-arrows-alt-h"></i></div>
             </div>
           </div>
@@ -1183,28 +1196,14 @@
   </div>
 
   <!-- ================= HELP MODAL ================= -->
-  <div class="modal-backdrop" id="help-modal">
+  <dialog class="modal-backdrop" id="help-modal" aria-labelledby="txt-modal-title" aria-modal="true">
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="txt-modal-title"><i class="fas fa-info-circle"></i> Sobre o VectorAI</h3>
-        <button class="modal-close" id="modal-close">&times;</button>
+        <button class="modal-close" id="modal-close" type="button" aria-label="Fechar ajuda" autofocus>&times;</button>
       </div>
       <div style="line-height: 1.6; font-size: 0.9rem; color: #d1d5db;" id="txt-modal-body">
-        <p><strong>VectorAI</strong> é um motor de vetorização de altíssima precisão baseado em pesquisa de ponta do <em>Stanford AI Lab</em>.</p>
-        <br>
-        <p><strong>Por que é diferente?</strong><br>
-        Ferramentas gratuitas comuns cortam os pixels bruscamente, criando bordas onduladas em diagonais. O VectorAI utiliza <em>Sub-pixel Anti-aliasing Inversion</em> e ajuste híbrido de retas e curvas de Bézier cúbicas (Algoritmo de Philip J. Schneider). Isso significa que uma reta diagonal é traçada com 2 nós perfeitos, eliminando totalmente qualquer deformação gerada pela baixa resolução da imagem.</p>
-        <br>
-        <p><strong>Recursos Principais:</strong><br>
-        • <strong>Recorte de Fundo IA:</strong> Isola o objeto principal e elimina fundos falsos (xadrez fake PNG, brancos e sombras) via rede neural U²-Net antes do traçado vetorial.<br>
-        • <strong>Super-Resolução IA 4x:</strong> Restaura arestas e microdetalhes via Real-ESRGAN.<br>
-        • <strong>Geometrização & Snapping:</strong> Encaixa retas ortogonais, cantos de 90° e círculos perfeitos.<br>
-        • <strong>Formatos Industriais:</strong> Exporta para PDF Vetorial, EPS (CorelDraw) e DXF (Laser/CNC).</p>
-        <br>
-        <p><strong>Dicas:</strong><br>
-        • Para logotipos e tipografia, mantenha o modo <em>Logotipo / Geométrico</em> ativo.<br>
-        • Use o botão <em>Abrir no IllustratorClone</em> para continuar editando os nós diretamente no nosso aplicativo de ilustração.</p>
-        <br>
+        <section id="help-guide"><h4>1. Importar uma imagem</h4><p>Use <strong>Escolher Imagem</strong>, arraste um JPG, PNG ou WEBP para a área de trabalho, ou cole uma imagem com Ctrl+V (⌘V no Mac).</p><h4>2. Ajustar e comparar</h4><p>Escolha <strong>Logotipo</strong> para duas cores ou <strong>Ilustração</strong> para preservar mais tons. Para degradês, use paleta <strong>Auto</strong> e transições <strong>Suaves</strong>. Compare usando Divisor, Original, Vetor Puro ou Lado a lado.</p><p>Recorte de fundo e ampliação são opcionais. Confira o método usado no status e revise o resultado antes de exportar.</p><h4>3. Salvar e exportar</h4><p><strong>Baixar SVG</strong> salva o vetor para abrir em um editor compatível. <strong>Baixar PNG</strong> salva uma imagem rasterizada. PDF e EPS são opções de exportação vetorial; DXF exporta contornos para programas de corte.</p><p>Para PDF, EPS e DXF, ajuste a largura e a unidade. No DXF, confira também a tolerância e a escala no programa de destino. Salve o resultado antes de fechar a página; o SVG exportado não armazena os ajustes da sessão.</p><h4>Usar pelo teclado</h4><ul><li><kbd>Tab</kbd> e <kbd>Shift+Tab</kbd>: navegar pelos controles; <kbd>Enter</kbd> ou <kbd>Espaço</kbd>: ativar botões.</li><li>Nos controles deslizantes, use as setas para ajustar valores.</li><li>Com o divisor selecionado, use ←/→ (1%) ou Shift+←/→ (10%); Home/End movem para os extremos.</li><li>Na área de comparação, use +/− para zoom, 0 para ajustar à tela e as setas para deslocar a imagem.</li><li><kbd>Esc</kbd> fecha esta ajuda e devolve o foco ao botão que a abriu.</li></ul></section>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 12px 0;">
         <p style="font-size: 0.82rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
           🌐 Links Oficiais & Ecossistema 4U.IA.BR
@@ -1227,16 +1226,16 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 
-  <script src="./processing_utils.js?v=3.4.0"></script>
-  <script src="./worker_engine.js?v=3.4.0"></script>
-  <script src="./vtracer_web.js?v=3.4.0"></script>
-  <script src="./geometric_snapper.js?v=3.4.0"></script>
-  <script src="./bg_remover.js?v=3.4.0"></script>
-  <script src="./industrial_exporter.js?v=3.4.0"></script>
-  <script src="./vector_engine.js?v=3.4.0"></script>
-  <script src="./ai_upscaler.js?v=3.4.0"></script>
+  <script src="./processing_utils.js?v=3.4.1"></script>
+  <script src="./worker_engine.js?v=3.4.1"></script>
+  <script src="./vtracer_web.js?v=3.4.1"></script>
+  <script src="./geometric_snapper.js?v=3.4.1"></script>
+  <script src="./bg_remover.js?v=3.4.1"></script>
+  <script src="./industrial_exporter.js?v=3.4.1"></script>
+  <script src="./vector_engine.js?v=3.4.1"></script>
+  <script src="./ai_upscaler.js?v=3.4.1"></script>
   <script>
     // Pre-load VTracer WebAssembly in background
     if (window.VTracer) {
@@ -1359,6 +1358,10 @@
       document.getElementById("txt-compare").textContent = lang === "en" ? "Side by side" : "Lado a lado";
       document.getElementById("txt-current").textContent = lang === "en" ? "Current version" : "Versão atual";
       currentLang = lang;
+      document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
+      document.getElementById('help-guide').innerHTML = lang === 'en' ? "<h4>1. Import an image</h4><p>Use <strong>Choose Image</strong>, drop a JPG, PNG or WEBP, or paste an image with Ctrl+V (⌘V on Mac).</p><h4>2. Adjust and compare</h4><p>Choose <strong>Logo</strong> for two colors or <strong>Illustration</strong> to preserve more tones. For gradients, use <strong>Auto</strong> colors and <strong>Smooth</strong> transitions. Compare with the divider, original, vector or side-by-side view.</p><p>Background removal and upscaling are optional. Check the processing method in the status and review the result before exporting.</p><h4>3. Save and export</h4><p><strong>Download SVG</strong> saves editable vector artwork. <strong>Download PNG</strong> saves a raster image. PDF and EPS export vectors; DXF exports outlines for cutting software.</p><p>Set the width and unit for PDF, EPS and DXF. For DXF, also check tolerance and scale in the destination application. Download your result before closing the page; the exported SVG does not save session settings.</p><h4>Keyboard controls</h4><ul><li><kbd>Tab</kbd> and <kbd>Shift+Tab</kbd>: navigate; <kbd>Enter</kbd> or <kbd>Space</kbd>: activate buttons.</li><li>Use arrow keys to adjust sliders.</li><li>On the divider, use ←/→ (1%) or Shift+←/→ (10%); Home/End move to the ends.</li><li>In the preview, use +/− to zoom, 0 to fit, and arrow keys to pan.</li><li><kbd>Esc</kbd> closes help and restores focus to its opener.</li></ul>" : "<h4>1. Importar uma imagem</h4><p>Use <strong>Escolher Imagem</strong>, arraste um JPG, PNG ou WEBP para a área de trabalho, ou cole uma imagem com Ctrl+V (⌘V no Mac).</p><h4>2. Ajustar e comparar</h4><p>Escolha <strong>Logotipo</strong> para duas cores ou <strong>Ilustração</strong> para preservar mais tons. Para degradês, use paleta <strong>Auto</strong> e transições <strong>Suaves</strong>. Compare usando Divisor, Original, Vetor Puro ou Lado a lado.</p><p>Recorte de fundo e ampliação são opcionais. Confira o método usado no status e revise o resultado antes de exportar.</p><h4>3. Salvar e exportar</h4><p><strong>Baixar SVG</strong> salva o vetor para abrir em um editor compatível. <strong>Baixar PNG</strong> salva uma imagem rasterizada. PDF e EPS são opções de exportação vetorial; DXF exporta contornos para programas de corte.</p><p>Para PDF, EPS e DXF, ajuste a largura e a unidade. No DXF, confira também a tolerância e a escala no programa de destino. Salve o resultado antes de fechar a página; o SVG exportado não armazena os ajustes da sessão.</p><h4>Usar pelo teclado</h4><ul><li><kbd>Tab</kbd> e <kbd>Shift+Tab</kbd>: navegar pelos controles; <kbd>Enter</kbd> ou <kbd>Espaço</kbd>: ativar botões.</li><li>Nos controles deslizantes, use as setas para ajustar valores.</li><li>Com o divisor selecionado, use ←/→ (1%) ou Shift+←/→ (10%); Home/End movem para os extremos.</li><li>Na área de comparação, use +/− para zoom, 0 para ajustar à tela e as setas para deslocar a imagem.</li><li><kbd>Esc</kbd> fecha esta ajuda e devolve o foco ao botão que a abriu.</li></ul>";
+      const accessibleLabels = {"btn-zoom-in":["Aumentar zoom","Zoom in"],"btn-zoom-out":["Diminuir zoom","Zoom out"],"modal-close":["Fechar ajuda","Close help"],"slider-lines":["Forçar linhas retas","Straight line tolerance"],"slider-smooth":["Suavização de curvas","Curve smoothing"],"slider-denoise":["Filtro de ruído","Noise filter"],"slider-colors":["Número de cores; 32 seleciona Auto","Number of colors; 32 selects Auto"],"slider-ai-bg-tol":["Tolerância do fundo","Background tolerance"],"sel-ai-bg-mode":["Modo de recorte","Background removal mode"],"chk-ai-upscale":["Super-resolução IA 4x","AI upscaling 4x"],"chk-ai-bg":["Recorte de fundo IA","AI background removal"],"chk-geom-snapping":["Geometrização","Geometric snapping"],"split-divider":["Comparação entre original e vetor","Original versus vector comparison"]};
+      for (const [id, names] of Object.entries(accessibleLabels)) document.getElementById(id)?.setAttribute('aria-label', names[lang === 'en' ? 1 : 0]);
       const t = i18n[lang] || i18n.pt;
       document.getElementById('txt-donate').innerHTML = t.donate;
       document.getElementById('txt-install').textContent = t.install;
@@ -1419,7 +1422,7 @@
 
     // Auto-detect browser language
     const userLang = (navigator.language || navigator.userLanguage || 'pt').toLowerCase();
-    if (!userLang.startsWith('pt')) applyLang('en');
+    applyLang(userLang.startsWith('pt') ? 'pt' : 'en');
 
     document.getElementById('btn-lang').addEventListener('click', () => {
       applyLang(currentLang === 'pt' ? 'en' : 'pt');
@@ -1908,6 +1911,7 @@
     });
 
     function updateSplitView() {
+      splitDivider.setAttribute('aria-valuenow', String(Math.round(splitPos * 100)));
       const paired = viewMode === 'compare';
       const container = document.getElementById('stage-container');
       container.style.width = (paired ? currentWidth * 2 + 24 : currentWidth) + 'px';
@@ -2046,12 +2050,39 @@
       fileInput.value = '';
     });
 
-    // --- HELP MODAL ---
+    // Native dialog provides focus containment and makes the background inert.
     const helpModal = document.getElementById('help-modal');
-    document.getElementById('btn-help').addEventListener('click', () => helpModal.classList.add('open'));
-    document.getElementById('modal-close').addEventListener('click', () => helpModal.classList.remove('open'));
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) helpModal.classList.remove('open');
+    let helpOpener = null;
+    document.getElementById('btn-help').addEventListener('click', () => {
+      helpOpener = document.activeElement;
+      if (!helpModal.open) helpModal.showModal();
+      document.getElementById('modal-close').focus();
+    });
+    document.getElementById('modal-close').addEventListener('click', () => helpModal.close());
+    helpModal.addEventListener('cancel', (event) => {event.preventDefault();helpModal.close();});
+    helpModal.addEventListener('close', () => {if(helpOpener?.isConnected) helpOpener.focus();});
+    helpModal.addEventListener('click', (event) => {if(event.target === helpModal) helpModal.close();});
+    splitDivider.addEventListener('keydown', (event) => {
+      const step = event.shiftKey ? 0.1 : 0.01;
+      if(event.key === 'ArrowLeft') splitPos -= step;
+      else if(event.key === 'ArrowRight') splitPos += step;
+      else if(event.key === 'Home') splitPos = 0;
+      else if(event.key === 'End') splitPos = 1;
+      else return;
+      event.preventDefault();splitPos = Math.max(0, Math.min(1, splitPos));updateSplitView();
+    });
+    viewport.addEventListener('keydown', (event) => {
+      if(event.target !== viewport || !currentImage || event.ctrlKey || event.metaKey || event.altKey) return;
+      const step = event.shiftKey ? 60 : 20;
+      if(event.key === '+' || event.key === '=') zoomLevel = Math.min(32, zoomLevel * 1.25);
+      else if(event.key === '-') zoomLevel = Math.max(0.01, zoomLevel / 1.25);
+      else if(event.key === '0') {event.preventDefault();fitStageToViewport();return;}
+      else if(event.key === 'ArrowLeft') panX -= step;
+      else if(event.key === 'ArrowRight') panX += step;
+      else if(event.key === 'ArrowUp') panY -= step;
+      else if(event.key === 'ArrowDown') panY += step;
+      else return;
+      event.preventDefault();updateTransform();
     });
 
     // --- PWA INSTALLATION ---
